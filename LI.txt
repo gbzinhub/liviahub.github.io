@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vejo Enfim a Luz Brilhar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff006e, #8338ec);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .artist {
+            font-size: 16px;
+            color: #b0b0b0;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .time-display {
+            font-size: 12px;
+            color: #b0b0b0;
+            min-width: 40px;
+            margin-right: 10px;
+        }
+
+        .bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff006e, #8338ec);
+            border-radius: 2px;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+        }
+
+        .total-time {
+            font-size: 12px;
+            color: #b0b0b0;
+            min-width: 40px;
+            margin-left: 10px;
+            text-align: right;
+        }
+
+        .lyrics-container {
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .lyric-line {
+            font-size: 18px;
+            color: #b0b0b0;
+            transition: all 0.3s ease;
+            opacity: 0.5;
+            transform: scale(0.9);
+            line-height: 1.6;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lyric-line.prev-2 {
+            opacity: 0.2;
+            transform: scale(0.8);
+            font-size: 14px;
+        }
+
+        .lyric-line.prev-1 {
+            opacity: 0.4;
+            transform: scale(0.9);
+        }
+
+        .lyric-line.current {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff006e;
+            opacity: 1;
+            transform: scale(1);
+            text-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
+        }
+
+        .lyric-line.next-1 {
+            opacity: 0.4;
+            transform: scale(0.9);
+        }
+
+        .lyric-line.next-2 {
+            opacity: 0.2;
+            transform: scale(0.8);
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff006e, #8338ec);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 0, 110, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 20px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .lyric-line.current {
+                font-size: 22px;
+            }
+
+            .lyric-line {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">Vejo Enfim a Luz Brilhar</div>
+            <div class="artist">Enrolados - Trilha Sonora</div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="time-display" id="currentTime">0:00</div>
+            <div class="bar">
+                <div class="bar-fill" id="barFill"></div>
+            </div>
+            <div class="total-time" id="totalTime">0:45</div>
+        </div>
+
+        <div class="lyrics-container">
+            <div class="lyric-line prev-2" id="prev2"></div>
+            <div class="lyric-line prev-1" id="prev1"></div>
+            <div class="lyric-line current" id="current">Ela, aqui, à luz das estrelas</div>
+            <div class="lyric-line next-1" id="next1"></div>
+            <div class="lyric-line next-2" id="next2"></div>
+        </div>
+
+        <div class="controls">
+            <button id="playBtn" onclick="togglePlay()">▶ Iniciar</button>
+            <button class="reset-btn" onclick="resetPlayer()">↻ Reiniciar</button>
+        </div>
+    </div>
+
+    <script>
+        const letra = [
+            { time: 0, text: "Ela, aqui, à luz das estrelas" },
+            { time: 3, text: "Com ela aqui, vejo quem eu sou" },
+            { time: 6, text: "Ela que me faz sentir" },
+            { time: 9, text: "Que eu sei pra onde vou" },
+            { time: 12, text: "Vejo enfim a luz brilhar" },
+            { time: 15, text: "Já passou o nevoeiro" },
+            { time: 18, text: "Vejo enfim a luz brilhar" },
+            { time: 21, text: "Para o alto me conduz" },
+            { time: 24, text: "E ela pode transformar" },
+            { time: 27, text: "De uma vez o mundo inteiro" },
+            { time: 30, text: "Tudo é novo pois agora eu vejo" },
+            { time: 34, text: "É você a luz" },
+            { time: 37, text: "É você a luz" },
+        ];
+
+        const totalDuration = 45;
+        let isPlaying = false;
+        let startTime = 0;
+        let pausedTime = 0;
+        let currentIndex = 0;
+        let animationId = null;
+
+        const playBtn = document.getElementById("playBtn");
+        const barFill = document.getElementById("barFill");
+        const currentTimeDisplay = document.getElementById("currentTime");
+        const prev2 = document.getElementById("prev2");
+        const prev1 = document.getElementById("prev1");
+        const current = document.getElementById("current");
+        const next1 = document.getElementById("next1");
+        const next2 = document.getElementById("next2");
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateLyrics(time) {
+            // Find current lyric index
+            for (let i = 0; i < letra.length; i++) {
+                if (time >= letra[i].time) {
+                    currentIndex = i;
+                }
+            }
+
+            // Update lyric displays
+            prev2.textContent = currentIndex >= 2 ? letra[currentIndex - 2].text : "";
+            prev1.textContent = currentIndex >= 1 ? letra[currentIndex - 1].text : "";
+            current.textContent = letra[currentIndex].text;
+            next1.textContent = currentIndex + 1 < letra.length ? letra[currentIndex + 1].text : "";
+            next2.textContent = currentIndex + 2 < letra.length ? letra[currentIndex + 2].text : "";
+        }
+
+        function updateProgress(time) {
+            const percentage = (time / totalDuration) * 100;
+            barFill.style.width = percentage + "%";
+            currentTimeDisplay.textContent = formatTime(time);
+        }
+
+        function animate() {
+            if (!isPlaying) return;
+
+            const now = Date.now();
+            const elapsedTime = (now - startTime) / 1000 + pausedTime;
+
+            if (elapsedTime >= totalDuration) {
+                isPlaying = false;
+                playBtn.textContent = "▶ Iniciar";
+                pausedTime = 0;
+                startTime = 0;
+                updateLyrics(0);
+                updateProgress(0);
+                return;
+            }
+
+            updateProgress(elapsedTime);
+            updateLyrics(elapsedTime);
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                isPlaying = false;
+                cancelAnimationFrame(animationId);
+                playBtn.textContent = "▶ Retomar";
+            } else {
+                isPlaying = true;
+                if (startTime === 0) {
+                    startTime = Date.now();
+                } else {
+                    startTime = Date.now() - pausedTime * 1000;
+                }
+                playBtn.textContent = "⏸ Pausar";
+                animate();
+            }
+        }
+
+        function resetPlayer() {
+            isPlaying = false;
+            pausedTime = 0;
+            startTime = 0;
+            currentIndex = 0;
+            cancelAnimationFrame(animationId);
+            playBtn.textContent = "▶ Iniciar";
+            updateProgress(0);
+            updateLyrics(0);
+        }
+
+        // Initialize
+        updateLyrics(0);
+    </script>
+</body>
+</html>
